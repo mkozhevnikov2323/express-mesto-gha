@@ -4,7 +4,7 @@
   "description": "mesto with server on express and mongo db",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "lint": "npx eslint ."
   },
   "repository": {
     "type": "git",
@@ -15,5 +15,11 @@
   "bugs": {
     "url": "https://github.com/mkozhevnikov2323/express-mesto-gha/issues"
   },
-  "homepage": "https://github.com/mkozhevnikov2323/express-mesto-gha#readme"
+  "homepage": "https://github.com/mkozhevnikov2323/express-mesto-gha#readme",
+  "devDependencies": {
+    "eslint": "^8.17.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-react": "^7.30.0"
+  }
 }
