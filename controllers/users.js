@@ -19,3 +19,19 @@ module.exports.getUserById = (req, res) => {
     .then((user) => res.send({ data: user }))
     .catch((err) => res.status(500).send({ message: err.message }));
 };
+
+module.exports.updateUserProfile = (req, res) => {
+  const { name, about } = req.body;
+
+  User.findByIdAndUpdate(req.params.id, { name, about })
+    .then((user) => res.send({ data: user }))
+    .catch((err) => res.status(500).send({ message: err.message }));
+};
+
+module.exports.updateUserAvatar = (req, res) => {
+  const { about } = req.body;
+
+  User.findByIdAndUpdate(req.params.id, { about })
+    .then((user) => res.send({ data: user }))
+    .catch((err) => res.status(500).send({ message: err.message }));
+};
