@@ -1,5 +1,16 @@
 const Card = require('../models/card');
 
+class ValidationError extends Error {
+  constructor() {
+    super();
+    this.name = 'ValidationError';
+    this.statusCode = 400;
+    this.message = {
+      message: 'Некорректное значение поля ввода. Поле ввода должно содержать от 2 до 30 символов.',
+    };
+  }
+}
+
 module.exports.createCard = (req, res) => {
   const {
     name, link, owner = req.user._id, likes, createdAt,
@@ -9,7 +20,11 @@ module.exports.createCard = (req, res) => {
     name, link, owner, likes, createdAt,
   })
     .then((card) => res.send({ data: card }))
-    .catch((err) => res.status(500).send({ message: err.message }));
+    .catch(() => {
+      // res.status(500).send({ message: err.message });
+      const validationError = new ValidationError('Произошла ошибка валидации');
+      res.status(validationError.statusCode).json(validationError.message);
+    });
 };
 
 module.exports.getCards = (req, res) => {
