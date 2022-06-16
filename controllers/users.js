@@ -6,7 +6,7 @@ module.exports.createUser = (req, res) => {
   User.create({ name, about, avatar })
     .then((user) => res.status(201).send({ data: user }))
     .catch(() => {
-      res.status(400).send({ message: 'Поле name и about должны содержать от 2 до 30 символов.' });
+      res.status(400).send({ message: 'Поле name и about должны содержать от 2 до 30 символов. Поле avatar не может быть пустым.' });
     });
 };
 
