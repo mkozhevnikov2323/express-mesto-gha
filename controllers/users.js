@@ -31,7 +31,11 @@ module.exports.getUserById = (req, res) => {
 module.exports.updateUserProfile = (req, res) => {
   const { name, about } = req.body;
 
-  User.findByIdAndUpdate(req.user._id, { name, about })
+  User.findByIdAndUpdate(req.user._id, { name, about }, {
+    new: true,
+    runValidators: true,
+    upsert: true,
+  })
     .then((user) => res.send({ data: user }))
     .catch(() => {
       res.status(400).send({ message: 'Поле name и about должны содержать от 2 до 30 символов.' });
@@ -41,7 +45,11 @@ module.exports.updateUserProfile = (req, res) => {
 module.exports.updateUserAvatar = (req, res) => {
   const { avatar } = req.body;
 
-  User.findByIdAndUpdate(req.user._id, { avatar })
+  User.findByIdAndUpdate(req.user._id, { avatar }, {
+    new: true,
+    runValidators: true,
+    upsert: true,
+  })
     .then((user) => res.send({ data: user }))
     .catch(() => {
       res.status(400).send({ message: 'Поле avatar не может быть пустым.' });
