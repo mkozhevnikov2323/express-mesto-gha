@@ -21,8 +21,7 @@ module.exports.createCard = (req, res) => {
   })
     .then((card) => res.send({ data: card }))
     .catch(() => {
-      // res.status(500).send({ message: err.message });
-      const validationError = new ValidationError('Произошла ошибка валидации');
+      const validationError = new ValidationError();
       res.status(validationError.statusCode).json(validationError.message);
     });
 };
@@ -36,7 +35,9 @@ module.exports.getCards = (req, res) => {
 module.exports.deleteCardById = (req, res) => {
   Card.findByIdAndRemove(req.params.id)
     .then((card) => res.send({ data: card }))
-    .catch((err) => res.status(500).send({ message: err.message }));
+    .catch((err) => {
+      res.send(err.name);
+    });
 };
 
 module.exports.addLikeCard = (req, res) => {
