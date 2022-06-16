@@ -1,16 +1,5 @@
 const Card = require('../models/card');
 
-class ValidationError extends Error {
-  constructor() {
-    super();
-    this.name = 'ValidationError';
-    this.statusCode = 400;
-    this.message = {
-      message: 'Некорректное значение поля ввода. Поле ввода должно содержать от 2 до 30 символов.',
-    };
-  }
-}
-
 module.exports.createCard = (req, res) => {
   const {
     name, link, owner = req.user._id, likes, createdAt,
@@ -19,10 +8,9 @@ module.exports.createCard = (req, res) => {
   Card.create({
     name, link, owner, likes, createdAt,
   })
-    .then((card) => res.send({ data: card }))
+    .then((card) => res.status(201).send({ data: card }))
     .catch(() => {
-      const validationError = new ValidationError();
-      res.status(validationError.statusCode).json(validationError.message);
+      res.status(400).send({ message: 'Поле name должно содержать от 2 до 30 символов. Поле link обязательно.' });
     });
 };
 
@@ -34,9 +22,15 @@ module.exports.getCards = (req, res) => {
 
 module.exports.deleteCardById = (req, res) => {
   Card.findByIdAndRemove(req.params.id)
-    .then((card) => res.send({ data: card }))
-    .catch((err) => {
-      res.send(err.name);
+    .then((card) => {
+      if (card === null) {
+        res.status(404).send({ message: 'Карточка не найдена' });
+        return;
+      }
+      res.send({ data: card });
+    })
+    .catch(() => {
+      res.status(400).send({ message: 'Некорректный id поля card.' });
     });
 };
 
@@ -46,8 +40,16 @@ module.exports.addLikeCard = (req, res) => {
     { $addToSet: { likes: req.user._id } },
     { new: true },
   )
-    .then((card) => res.send({ data: card }))
-    .catch((err) => res.status(500).send({ message: err.message }));
+    .then((card) => {
+      if (card === null) {
+        res.status(404).send({ message: 'Карточка не найдена' });
+        return;
+      }
+      res.send({ data: card });
+    })
+    .catch(() => {
+      res.status(400).send({ message: 'Некорректный id поля card.' });
+    });
 };
 
 module.exports.deleteLikeCard = (req, res) => {
@@ -56,6 +58,14 @@ module.exports.deleteLikeCard = (req, res) => {
     { $pull: { likes: req.user._id } },
     { new: true },
   )
-    .then((card) => res.send({ data: card }))
-    .catch((err) => res.status(500).send({ message: err.message }));
+    .then((card) => {
+      if (card === null) {
+        res.status(404).send({ message: 'Карточка не найдена' });
+        return;
+      }
+      res.send({ data: card });
+    })
+    .catch(() => {
+      res.status(400).send({ message: 'Некорректный id поля card.' });
+    });
 };
