@@ -9,8 +9,12 @@ module.exports.createCard = (req, res) => {
     name, link, owner, likes, createdAt,
   })
     .then((card) => res.status(201).send({ data: card }))
-    .catch(() => {
-      res.status(400).send({ message: 'Поле name должно содержать от 2 до 30 символов. Поле link обязательно.' });
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        res.status(400).send({ message: 'Поле name должно содержать от 2 до 30 символов. Поле link обязательно.' });
+      } else {
+        res.status(500).send({ message: 'Внутренняя ошибка на сервере.' });
+      }
     });
 };
 
@@ -29,8 +33,12 @@ module.exports.deleteCardById = (req, res) => {
       }
       res.send({ data: card });
     })
-    .catch(() => {
-      res.status(400).send({ message: 'Некорректный id поля card.' });
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        res.status(400).send({ message: 'Некорректный id поля card.' });
+      } else {
+        res.status(500).send({ message: 'Внутренняя ошибка на сервере.' });
+      }
     });
 };
 
@@ -47,8 +55,12 @@ module.exports.addLikeCard = (req, res) => {
       }
       res.send({ data: card });
     })
-    .catch(() => {
-      res.status(400).send({ message: 'Некорректный id поля card.' });
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        res.status(400).send({ message: 'Некорректный id поля card.' });
+      } else {
+        res.status(500).send({ message: 'Внутренняя ошибка на сервере.' });
+      }
     });
 };
 
@@ -65,7 +77,11 @@ module.exports.deleteLikeCard = (req, res) => {
       }
       res.send({ data: card });
     })
-    .catch(() => {
-      res.status(400).send({ message: 'Некорректный id поля card.' });
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        res.status(400).send({ message: 'Некорректный id поля card.' });
+      } else {
+        res.status(500).send({ message: 'Внутренняя ошибка на сервере.' });
+      }
     });
 };

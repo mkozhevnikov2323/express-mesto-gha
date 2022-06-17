@@ -5,8 +5,12 @@ module.exports.createUser = (req, res) => {
 
   User.create({ name, about, avatar })
     .then((user) => res.status(201).send({ data: user }))
-    .catch(() => {
-      res.status(400).send({ message: 'Поле name и about должны содержать от 2 до 30 символов. Поле avatar не может быть пустым.' });
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        res.status(400).send({ message: 'Поле name и about должны содержать от 2 до 30 символов. Поле avatar не может быть пустым.' });
+      } else {
+        res.status(500).send({ message: 'Внутренняя ошибка на сервере.' });
+      }
     });
 };
 
@@ -25,7 +29,13 @@ module.exports.getUserById = (req, res) => {
       }
       res.send({ data: user });
     })
-    .catch(() => res.status(400).send({ message: 'Некорректный параметр id' }));
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        res.status(400).send({ message: 'Некорректный параметр id поля user.' });
+      } else {
+        res.status(500).send({ message: 'Внутренняя ошибка на сервере.' });
+      }
+    });
 };
 
 module.exports.updateUserProfile = (req, res) => {
@@ -34,11 +44,14 @@ module.exports.updateUserProfile = (req, res) => {
   User.findByIdAndUpdate(req.user._id, { name, about }, {
     new: true,
     runValidators: true,
-    upsert: true,
   })
     .then((user) => res.send({ data: user }))
-    .catch(() => {
-      res.status(400).send({ message: 'Поле name и about должны содержать от 2 до 30 символов.' });
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        res.status(400).send({ message: 'Поле name и about должны содержать от 2 до 30 символов.' });
+      } else {
+        res.status(500).send({ message: 'Внутренняя ошибка на сервере.' });
+      }
     });
 };
 
@@ -48,10 +61,13 @@ module.exports.updateUserAvatar = (req, res) => {
   User.findByIdAndUpdate(req.user._id, { avatar }, {
     new: true,
     runValidators: true,
-    upsert: true,
   })
     .then((user) => res.send({ data: user }))
-    .catch(() => {
-      res.status(400).send({ message: 'Поле avatar не может быть пустым.' });
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        res.status(400).send({ message: 'Поле avatar не может быть пустым.' });
+      } else {
+        res.status(500).send({ message: 'Внутренняя ошибка на сервере.' });
+      }
     });
 };
