@@ -43,6 +43,12 @@ module.exports.login = (req, res) => {
     });
 };
 
+module.exports.getUserInfo = (req,res) => {
+  User.findOne({ email: req.body.email })
+    .then((user) => res.send({ data: user }))
+    .catch((err) => res.status(500).send({ message: err.message }));
+};
+
 module.exports.getUsers = (req, res) => {
   User.find({})
     .then((user) => res.send({ data: user }))

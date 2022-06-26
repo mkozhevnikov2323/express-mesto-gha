@@ -16,13 +16,13 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
   .then(() => console.log('mongoose connect...'))
   .catch((e) => console.log(e));
 
-app.use((req, res, next) => {
-  req.user = {
-    _id: '62a9001bbf0b724beb420e0d',
-  };
+// app.use((req, res, next) => {
+//   req.user = {
+//     _id: '62a9001bbf0b724beb420e0d',
+//   };
 
-  next();
-});
+//   next();
+// });
 
 app.post('/signin', login);
 app.post('/signup', createUser);
