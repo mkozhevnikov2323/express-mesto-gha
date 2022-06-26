@@ -22,6 +22,8 @@ app.use((req, res, next) => {
   next();
 });
 
+app.post('/signin', login);
+app.post('/signup', createUser);
 app.use('/users', require('./routes/users'));
 app.use('/cards', require('./routes/cards'));
 
