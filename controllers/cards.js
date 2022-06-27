@@ -1,4 +1,5 @@
 const Card = require('../models/card');
+const user = require('../models/user');
 
 module.exports.createCard = (req, res) => {
   const {
@@ -29,6 +30,10 @@ module.exports.deleteCardById = (req, res) => {
     .then((card) => {
       if (card === null) {
         res.status(404).send({ message: 'Карточка не найдена' });
+        return;
+      }
+      if (card.owner !== user._id) {
+        res.status(403).send({ message: 'Доступ запрещен' });
         return;
       }
       res.send({ data: card });
