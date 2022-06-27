@@ -50,13 +50,25 @@ module.exports.login = (req, res) => {
 
 module.exports.getUserInfo = (req, res) => {
   User.findOne({ email: req.body.email })
-    .then((user) => res.send({ data: user }))
+    .then((user) => res.send({
+      name: user.name,
+      about: user.about,
+      avatar: user.avatar,
+      email: user.email,
+      _id: user._id,
+    }))
     .catch((err) => res.status(500).send({ message: err.message }));
 };
 
 module.exports.getUsers = (req, res) => {
   User.find({})
-    .then((user) => res.send({ data: user }))
+    .then((user) => res.send({
+      name: user.name,
+      about: user.about,
+      avatar: user.avatar,
+      email: user.email,
+      _id: user._id,
+    }))
     .catch((err) => res.status(500).send({ message: err.message }));
 };
 
@@ -67,7 +79,13 @@ module.exports.getUserById = (req, res) => {
         res.status(404).send({ message: 'Пользователь не найден' });
         return;
       }
-      res.send({ data: user });
+      res.send({
+        name: user.name,
+        about: user.about,
+        avatar: user.avatar,
+        email: user.email,
+        _id: user._id,
+      });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
@@ -85,7 +103,13 @@ module.exports.updateUserProfile = (req, res) => {
     new: true,
     runValidators: true,
   })
-    .then((user) => res.send({ data: user }))
+    .then((user) => res.send({
+      name: user.name,
+      about: user.about,
+      avatar: user.avatar,
+      email: user.email,
+      _id: user._id,
+    }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(400).send({ message: 'Поле name и about должны содержать от 2 до 30 символов.' });
@@ -102,7 +126,13 @@ module.exports.updateUserAvatar = (req, res) => {
     new: true,
     runValidators: true,
   })
-    .then((user) => res.send({ data: user }))
+    .then((user) => res.send({
+      name: user.name,
+      about: user.about,
+      avatar: user.avatar,
+      email: user.email,
+      _id: user._id,
+    }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(400).send({ message: 'Поле avatar не может быть пустым.' });
