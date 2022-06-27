@@ -17,13 +17,6 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
   .then(() => console.log('mongoose connect...'))
   .catch((e) => console.log(e));
 
-// app.use((req, res, next) => {
-//   req.user = {
-//     _id: '62a9001bbf0b724beb420e0d',
-//   };
-
-//   next();
-// });
 app.use(errors());
 
 app.post('/signin', login);

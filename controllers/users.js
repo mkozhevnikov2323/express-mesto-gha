@@ -3,10 +3,6 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 
 module.exports.createUser = (req, res) => {
-  // const {
-  //   name, about, avatar, email, password,
-  // } = req.body;
-
   bcrypt.hash(req.body.password, 10)
     .then((hash) => User.create({
       name: req.body.name,
@@ -30,7 +26,7 @@ module.exports.login = (req, res) => {
 
   return User.findUserByCredentials(email, password)
     .then((user) => {
-      const token = jwt.sign({ _id: user._id }, 'some-very-secret-key', { expiresIn: '7d' });
+      const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
 
       // вернём токен
       res.send({ token });
@@ -38,12 +34,12 @@ module.exports.login = (req, res) => {
     .catch((err) => {
       // ошибка аутентификации
       res
-        .status(401)
+        .status(402)
         .send({ message: err.message });
     });
 };
 
-module.exports.getUserInfo = (req,res) => {
+module.exports.getUserInfo = (req, res) => {
   User.findOne({ email: req.body.email })
     .then((user) => res.send({ data: user }))
     .catch((err) => res.status(500).send({ message: err.message }));
