@@ -1,6 +1,7 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
+const NotFoundError = require('../errors/not-found-err');
 
 module.exports.createUser = (req, res) => {
   bcrypt.hash(req.body.password, 10)
@@ -48,7 +49,7 @@ module.exports.login = (req, res) => {
     });
 };
 
-module.exports.getUserInfo = (req, res) => {
+module.exports.getUserInfo = (req, res, next) => {
   User.findOne({ email: req.body.email })
     .then((user) => res.send({
       name: user.name,
@@ -57,10 +58,10 @@ module.exports.getUserInfo = (req, res) => {
       email: user.email,
       _id: user._id,
     }))
-    .catch((err) => res.status(500).send({ message: err.message }));
+    .catch(next);
 };
 
-module.exports.getUsers = (req, res) => {
+module.exports.getUsers = (req, res, next) => {
   User.find({})
     .then((user) => res.send({
       name: user.name,
@@ -69,15 +70,14 @@ module.exports.getUsers = (req, res) => {
       email: user.email,
       _id: user._id,
     }))
-    .catch((err) => res.status(500).send({ message: err.message }));
+    .catch(next);
 };
 
-module.exports.getUserById = (req, res) => {
+module.exports.getUserById = (req, res, next) => {
   User.findById(req.params.id)
     .then((user) => {
       if (user === null) {
-        res.status(404).send({ message: 'Пользователь не найден' });
-        return;
+        throw new NotFoundError('Пользователь не найден!');
       }
       res.send({
         name: user.name,
@@ -87,16 +87,10 @@ module.exports.getUserById = (req, res) => {
         _id: user._id,
       });
     })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Некорректный параметр id поля user.' });
-      } else {
-        res.status(500).send({ message: 'Внутренняя ошибка на сервере.' });
-      }
-    });
+    .catch(next);
 };
 
-module.exports.updateUserProfile = (req, res) => {
+module.exports.updateUserProfile = (req, res, next) => {
   const { name, about } = req.body;
 
   User.findByIdAndUpdate(req.user._id, { name, about }, {
@@ -110,13 +104,16 @@ module.exports.updateUserProfile = (req, res) => {
       email: user.email,
       _id: user._id,
     }))
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        res.status(400).send({ message: 'Поле name и about должны содержать от 2 до 30 символов.' });
-      } else {
-        res.status(500).send({ message: 'Внутренняя ошибка на сервере.' });
-      }
-    });
+    // .catch((err) => {
+    //   if (err.name === 'ValidationError') {
+    //     res.status(400).send({
+    //     message: 'Поле name и about должны содержать от 2 до 30 символов.'
+    //   });
+    //   } else {
+    //     res.status(500).send({ message: 'Внутренняя ошибка на сервере.' });
+    //   }
+    // });
+    .catch(next);
 };
 
 module.exports.updateUserAvatar = (req, res) => {
