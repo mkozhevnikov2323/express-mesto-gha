@@ -2,6 +2,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const NotFoundError = require('../errors/not-found-err');
+const AuthorizationError = require('../errors/authorization-err');
 
 const returnUserData = (user) => ({
   name: user.name,
@@ -31,6 +32,9 @@ module.exports.login = (req, res, next) => {
     .then((user) => {
       const token = jwt.sign({ _id: user._id }, '2e48302a6e4e6f4d364e51ef2d924411121f752eb4087571abe112de648773ff', { expiresIn: '7d' });
       res.send({ token });
+    })
+    .catch(() => {
+      throw new AuthorizationError('Неправильные почта или пароль!');
     })
     .catch(next);
 };

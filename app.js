@@ -52,6 +52,10 @@ app.use((err, req, res, next) => {
     res.status(409).send({ message: 'Пользователь с данным E-mail присутствует в базе.' });
     return;
   }
+  if (err.code === 13) {
+    res.status(401).send({ message: 'Неправильные почта или пароль!' });
+    return;
+  }
   if (err.name === 'ValidationError') {
     res.status(400).send({ message: 'Некорректный email или длина пароля менее 8 символов.' });
   }
@@ -63,7 +67,7 @@ app.use((err, req, res, next) => {
     .status(statusCode)
     .send({
       message: statusCode === 500
-        ? ('На сервере произошла ошибка', message, err.code)
+        ? ('На сервере произошла ошибка')
         : message,
     });
 });
