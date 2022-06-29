@@ -3,7 +3,15 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const NotFoundError = require('../errors/not-found-err');
 
-module.exports.createUser = (req, res) => {
+const returnUserData = (user) => ({
+  name: user.name,
+  about: user.about,
+  avatar: user.avatar,
+  email: user.email,
+  _id: user._id,
+});
+
+module.exports.createUser = (req, res, next) => {
   bcrypt.hash(req.body.password, 10)
     .then((hash) => User.create({
       name: req.body.name,
@@ -12,64 +20,30 @@ module.exports.createUser = (req, res) => {
       email: req.body.email,
       password: hash,
     }))
-    .then((user) => res.status(201).send({
-      name: user.name,
-      about: user.about,
-      avatar: user.avatar,
-      email: user.email,
-      _id: user._id,
-    }))
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        res.status(400).send({ message: 'Некорректный email или длина пароля менее 8 символов.' });
-      }
-      if (err.code === 11000) {
-        res.status(409).send({ message: 'Пользователь с данным E-mail присутствует в базе.' });
-      } else {
-        res.status(500).send({ message: 'Внутренняя ошибка на сервере.' });
-      }
-    });
+    .then((user) => res.status(201).send(returnUserData(user)))
+    .catch(next);
 };
 
-module.exports.login = (req, res) => {
+module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
 
   return User.findUserByCredentials(email, password)
     .then((user) => {
       const token = jwt.sign({ _id: user._id }, '2e48302a6e4e6f4d364e51ef2d924411121f752eb4087571abe112de648773ff', { expiresIn: '7d' });
-
-      // вернём токен
       res.send({ token });
     })
-    .catch((err) => {
-      // ошибка аутентификации
-      res
-        .status(401)
-        .send({ message: err.message });
-    });
+    .catch(next);
 };
 
 module.exports.getUserInfo = (req, res, next) => {
   User.findOne({ email: req.body.email })
-    .then((user) => res.send({
-      name: user.name,
-      about: user.about,
-      avatar: user.avatar,
-      email: user.email,
-      _id: user._id,
-    }))
+    .then((user) => res.send(returnUserData(user)))
     .catch(next);
 };
 
 module.exports.getUsers = (req, res, next) => {
   User.find({})
-    .then((user) => res.send({
-      name: user.name,
-      about: user.about,
-      avatar: user.avatar,
-      email: user.email,
-      _id: user._id,
-    }))
+    .then((user) => res.send(returnUserData(user)))
     .catch(next);
 };
 
@@ -79,13 +53,7 @@ module.exports.getUserById = (req, res, next) => {
       if (user === null) {
         throw new NotFoundError('Пользователь не найден!');
       }
-      res.send({
-        name: user.name,
-        about: user.about,
-        avatar: user.avatar,
-        email: user.email,
-        _id: user._id,
-      });
+      res.send(returnUserData(user));
     })
     .catch(next);
 };
@@ -97,44 +65,17 @@ module.exports.updateUserProfile = (req, res, next) => {
     new: true,
     runValidators: true,
   })
-    .then((user) => res.send({
-      name: user.name,
-      about: user.about,
-      avatar: user.avatar,
-      email: user.email,
-      _id: user._id,
-    }))
-    // .catch((err) => {
-    //   if (err.name === 'ValidationError') {
-    //     res.status(400).send({
-    //     message: 'Поле name и about должны содержать от 2 до 30 символов.'
-    //   });
-    //   } else {
-    //     res.status(500).send({ message: 'Внутренняя ошибка на сервере.' });
-    //   }
-    // });
+    .then((user) => res.send(returnUserData(user)))
     .catch(next);
 };
 
-module.exports.updateUserAvatar = (req, res) => {
+module.exports.updateUserAvatar = (req, res, next) => {
   const { avatar } = req.body;
 
   User.findByIdAndUpdate(req.user._id, { avatar }, {
     new: true,
     runValidators: true,
   })
-    .then((user) => res.send({
-      name: user.name,
-      about: user.about,
-      avatar: user.avatar,
-      email: user.email,
-      _id: user._id,
-    }))
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        res.status(400).send({ message: 'Поле avatar не может быть пустым.' });
-      } else {
-        res.status(500).send({ message: 'Внутренняя ошибка на сервере.' });
-      }
-    });
+    .then((user) => res.send(returnUserData(user)))
+    .catch(next);
 };

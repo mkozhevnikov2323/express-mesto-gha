@@ -23,6 +23,7 @@ app.post('/signin', celebrate({
     password: Joi.string().required().min(8),
   }),
 }), login);
+
 app.post('/signup', celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email(),
@@ -46,6 +47,17 @@ app.use(errors());
 // eslint-disable-next-line no-unused-vars
 app.use((err, req, res, next) => {
   const { statusCode = 500, message } = err;
+
+  if (err.code === 11000) {
+    res.status(409).send({ message: 'Пользователь с данным E-mail присутствует в базе.' });
+    return;
+  }
+  if (err.name === 'ValidationError') {
+    res.status(400).send({ message: 'Некорректный email или длина пароля менее 8 символов.' });
+  }
+  if (err.name === 'CastError') {
+    res.status(400).send({ message: 'Некорректный id.' });
+  }
 
   res
     .status(statusCode)
