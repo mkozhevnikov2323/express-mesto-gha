@@ -13,9 +13,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 mongoose.connect('mongodb://localhost:27017/mestodb', {
   useNewUrlParser: true,
-})
-  .then(() => console.log('mongoose connect...'))
-  .catch((e) => console.log(e));
+});
 
 app.post('/signin', celebrate({
   body: Joi.object().keys({
@@ -72,6 +70,4 @@ app.use((err, req, res, next) => {
     });
 });
 
-app.listen(PORT, () => {
-  console.log(`App listening on port ${PORT}`);
-});
+app.listen(PORT);
