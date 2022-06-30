@@ -3,18 +3,16 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const NotFoundError = require('../errors/not-found-err');
 
-const returnUserData = (user) => ({
-  name: user.name,
-  about: user.about,
-  avatar: user.avatar,
-  email: user.email,
-  _id: user._id,
-});
-
 module.exports.createUser = (req, res, next) => {
   bcrypt.hash(req.body.password, 10)
     .then((hash) => User.create({ ...req.body, password: hash }))
-    .then((user) => res.status(201).send(returnUserData(user)))
+    .then((user) => res.status(201).send({
+      name: user.name,
+      about: user.about,
+      avatar: user.avatar,
+      email: user.email,
+      _id: user._id,
+    }))
     .catch(next);
 };
 
