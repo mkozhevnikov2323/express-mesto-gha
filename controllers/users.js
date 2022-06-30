@@ -47,7 +47,7 @@ module.exports.getUserInfo = (req, res, next) => {
 
 module.exports.getUsers = (req, res, next) => {
   User.find({})
-    .then((user) => res.send(returnUserData(user)))
+    .then((user) => res.status(200).send(user))
     .catch(next);
 };
 
