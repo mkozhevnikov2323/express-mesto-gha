@@ -3,13 +3,9 @@ const NotFoundError = require('../errors/not-found-err');
 const ForbiddenError = require('../errors/forbidden-err');
 
 module.exports.createCard = (req, res, next) => {
-  const {
-    name, link, owner = req.user._id, likes, createdAt,
-  } = req.body;
+  const { name, link, owner = req.user._id } = req.body;
 
-  Card.create({
-    name, link, owner, likes, createdAt,
-  })
+  Card.create({ name, link, owner })
     .then((card) => res.status(201).send({ data: card }))
     .catch(next);
 };
@@ -27,16 +23,11 @@ module.exports.deleteCardById = (req, res, next) => {
         throw new NotFoundError('Карточка не найдена!');
       }
       if (card.owner.toString() !== req.user._id) {
-        console.log(card.owner.toString());
-        console.log(req.user._id);
         throw new ForbiddenError('Нельзя удалить чужую карточку!');
       }
-      Card.findByIdAndRemove(req.params.id)
-        .then(() => {
-          res.send({ data: card });
-        })
-        .catch(next);
+      return card.remove();
     })
+    .then((card) => res.send({ data: card }))
     .catch(next);
 };
 
