@@ -40,8 +40,8 @@ module.exports.login = (req, res, next) => {
 };
 
 module.exports.getUserInfo = (req, res, next) => {
-  User.findOne({ email: req.body.email })
-    .then((user) => res.send(returnUserData(user)))
+  User.findOne({ _id: req.user._id })
+    .then((user) => res.status(200).send(returnUserData(user)))
     .catch(next);
 };
 
@@ -57,7 +57,7 @@ module.exports.getUserById = (req, res, next) => {
       if (user === null) {
         throw new NotFoundError('Пользователь не найден!');
       }
-      res.send(returnUserData(user));
+      res.status(200).send(returnUserData(user));
     })
     .catch(next);
 };
